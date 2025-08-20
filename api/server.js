@@ -166,6 +166,72 @@ app.get("/users/:id", async (req, res) => {
 });
 
 
+
+// ---------------------- Blog Schema ----------------------
+const BlogSchema = new mongoose.Schema(
+  {
+    title: { type: String, required: true },
+    tags: [{ type: String }],
+    description: { type: String, required: true }, // CKEditor content (HTML)
+    author: { type: mongoose.Schema.Types.ObjectId, ref: "User" }, // optional if you want to link with logged in user
+  },
+  { timestamps: true }
+);
+
+const Blog = mongoose.model("Blog", BlogSchema);
+
+// ---------------------- Blog Routes ----------------------
+
+// Create a blog (protected route → only logged in users can post)
+app.post("/blogs", authMiddleware, async (req, res) => {
+  try {
+    const { title, tags, description } = req.body;
+
+    if (!title || !description) {
+      return res.status(400).json({ error: "Title and description are required" });
+    }
+
+    const newBlog = new Blog({
+      title,
+      tags,
+      description,
+      author: req.user.id, // take logged in user ID from JWT
+    });
+
+    await newBlog.save();
+    res.status(201).json(newBlog);
+  } catch (err) {
+    res.status(500).json({ error: "Failed to create blog" });
+  }
+});
+
+// Get all blogs (public)
+app.get("/blogs", async (req, res) => {
+  try {
+    const blogs = await Blog.find()
+      .populate("author", "username email -_id") // optional: show author details
+      .sort({ createdAt: -1 }); // latest first
+
+    res.json(blogs);
+  } catch (err) {
+    res.status(500).json({ error: "Failed to fetch blogs" });
+  }
+});
+
+// Get single blog by ID
+app.get("/blogs/:id", async (req, res) => {
+  try {
+    const blog = await Blog.findById(req.params.id).populate("author", "username email -_id");
+    if (!blog) return res.status(404).json({ error: "Blog not found" });
+    res.json(blog);
+  } catch (err) {
+    res.status(500).json({ error: "Failed to fetch blog" });
+  }
+});
+
+
+
+
 // Protected route example
 app.get("/auth/me", authMiddleware, async (req, res) => {
   try {
@@ -175,6 +241,7 @@ app.get("/auth/me", authMiddleware, async (req, res) => {
     res.status(500).json({ error: "Failed to fetch user" });
   }
 });
+
 
 // ---------------------- Export app ----------------------
 export default app;
