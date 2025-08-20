@@ -145,7 +145,7 @@ app.post("/auth/login", async (req, res) => {
 // ---------------------- User APIs ----------------------
 
 // Get all users (⚠️ normally you'd restrict this to admin only)
-app.get("/users", authMiddleware, async (req, res) => {
+app.get("/users", async (req, res) => {
   try {
     const users = await User.find().select("-password"); // hide password
     res.json(users);
@@ -155,7 +155,7 @@ app.get("/users", authMiddleware, async (req, res) => {
 });
 
 // Get single user by ID
-app.get("/users/:id", authMiddleware, async (req, res) => {
+app.get("/users/:id", async (req, res) => {
   try {
     const user = await User.findById(req.params.id).select("-password");
     if (!user) return res.status(404).json({ error: "User not found" });
