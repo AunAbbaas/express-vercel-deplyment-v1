@@ -1,6 +1,9 @@
 import express from "express";
 import mongoose from "mongoose";
 import cors from "cors";
+import dotenv from "dotenv";   // ✅ import dotenv
+
+dotenv.config();  // ✅ load .env file
 
 const app = express();
 
@@ -8,7 +11,12 @@ app.use(cors());
 app.use(express.json());
 
 // MongoDB connection (use env var on Vercel)
-const MONGO_URI = process.env.MONGO_URI;
+const MONGO_URI = 'mongodb+srv://aaun0019:th4jOdEvesaGseUM@cluster0.gqfpkez.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0';
+
+if (!MONGO_URI) {
+  console.error("❌ MONGO_URI is not defined in .env");
+  process.exit(1);
+}
 
 mongoose.connect(MONGO_URI)
   .then(() => console.log("✅ MongoDB connected"))
@@ -23,7 +31,7 @@ const ItemSchema = new mongoose.Schema({
 const Item = mongoose.model("Item", ItemSchema);
 
 // Routes
-app.get("/api/items", async (req, res) => {
+app.get("/", async (req, res) => {
   try {
     const items = await Item.find();
     res.json(items);
@@ -32,7 +40,7 @@ app.get("/api/items", async (req, res) => {
   }
 });
 
-app.post("/api/items", async (req, res) => {
+app.post("/", async (req, res) => {
   try {
     const { name, description } = req.body;
     const newItem = new Item({ name, description });
