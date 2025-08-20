@@ -141,6 +141,31 @@ app.post("/auth/login", async (req, res) => {
   }
 });
 
+
+// ---------------------- User APIs ----------------------
+
+// Get all users (⚠️ normally you'd restrict this to admin only)
+app.get("/users", authMiddleware, async (req, res) => {
+  try {
+    const users = await User.find().select("-password"); // hide password
+    res.json(users);
+  } catch (err) {
+    res.status(500).json({ error: "Failed to fetch users" });
+  }
+});
+
+// Get single user by ID
+app.get("/users/:id", authMiddleware, async (req, res) => {
+  try {
+    const user = await User.findById(req.params.id).select("-password");
+    if (!user) return res.status(404).json({ error: "User not found" });
+    res.json(user);
+  } catch (err) {
+    res.status(500).json({ error: "Failed to fetch user" });
+  }
+});
+
+
 // Protected route example
 app.get("/auth/me", authMiddleware, async (req, res) => {
   try {
