@@ -207,7 +207,7 @@ app.post("/blogs", async (req, res) => {
 app.get("/blogs", async (req, res) => {
   try {
     const blogs = await Blog.find()
-      .populate("author", "username email -_id") // optional: show author details
+      .populate("username email -_id") // optional: show author details
       .sort({ createdAt: -1 }); // latest first
 
     res.json(blogs);
