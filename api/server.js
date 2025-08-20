@@ -173,7 +173,6 @@ const BlogSchema = new mongoose.Schema(
     title: { type: String, required: true },
     tags: [{ type: String }],
     description: { type: String, required: true }, // CKEditor content (HTML)
-    author: { type: mongoose.Schema.Types.ObjectId, ref: "User" }, // optional if you want to link with logged in user
   },
   { timestamps: true }
 );
@@ -195,7 +194,6 @@ app.post("/blogs", async (req, res) => {
       title,
       tags,
       description,
-      author: req.user.id, // take logged in user ID from JWT
     });
 
     await newBlog.save();
