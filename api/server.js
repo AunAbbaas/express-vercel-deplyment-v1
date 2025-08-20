@@ -183,7 +183,7 @@ const Blog = mongoose.model("Blog", BlogSchema);
 // ---------------------- Blog Routes ----------------------
 
 // Create a blog (protected route → only logged in users can post)
-app.post("/blogs", authMiddleware, async (req, res) => {
+app.post("/blogs", async (req, res) => {
   try {
     const { title, tags, description } = req.body;
 
