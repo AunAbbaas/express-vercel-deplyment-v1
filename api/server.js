@@ -31,7 +31,7 @@ const ItemSchema = new mongoose.Schema({
 const Item = mongoose.model("Item", ItemSchema);
 
 // Routes
-app.get("/", async (req, res) => {
+app.get("/api", async (req, res) => {
   try {
     const items = await Item.find();
     res.json(items);
@@ -40,7 +40,7 @@ app.get("/", async (req, res) => {
   }
 });
 
-app.post("/", async (req, res) => {
+app.post("/api", async (req, res) => {
   try {
     const { name, description } = req.body;
     const newItem = new Item({ name, description });
